@@ -36,13 +36,23 @@ class VenueScreen extends ConsumerWidget {
                 ],
               );
             } else if (snapshot.hasData) {
+              List<String> venueIds= snapshot.data!.docs.map((doc)=>doc.id).toList();
               return ListView.builder(
-                itemCount: snapshot.data!.docs.length,
+                itemCount:snapshot.data!.docs.length ,
                 itemBuilder: (context, index) {
-                  DocumentSnapshot doc = snapshot.data!.docs[index];
+                  DocumentSnapshot venue = snapshot.data!.docs[index];
                   return ListTile(
-                    title: Text(doc['name'] ?? "No name"),
-                    onTap: () {},
+                    leading: SizedBox(
+                        width: 200,
+                        child: Image.network(venue["image_url"],fit: BoxFit.fill,)),
+                    title: Text(venue['name']),
+                    subtitle: Text(
+                        'Capacity: ${venue['capacity']} | Price/Plate: Rs.${venue['price_per_plate']} | Location: ${venue["place"]}'),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.delete, color: Colors.red),
+                      onPressed: () => provider.deleteVenue(venue.id,context),
+                    ),
+                    onTap: () => provider.updateVenue(venue.id,context)
                   );
                 },
               );
@@ -57,7 +67,9 @@ class VenueScreen extends ConsumerWidget {
       )
       ,
       floatingActionButton: FloatingActionButton(
-        onPressed: (){},
+        onPressed: (){
+          provider.addVenue(context);
+        },
         child: const Icon(Icons.add),
       ),
     );

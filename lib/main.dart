@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
         ),
         primarySwatch: Colors.blue,
       ),
-      home: DataPage(),
+      home: Home(),
       onGenerateRoute: (setting)=>Routes.genRoute(setting),
     );
 

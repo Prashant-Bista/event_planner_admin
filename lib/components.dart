@@ -25,9 +25,11 @@ class _VenueDialogState extends State<VenueDialog> {
     if (widget.venue != null) {
       _nameController.text = widget.venue!['name'];
       _capacityController.text = widget.venue!['capacity'].toString();
-      _imageController.text = widget.venue!['image'];
-      _priceController.text = widget.venue!['pricePerPlate'].toString();
+      _imageController.text = widget.venue!['image_url'];
+      _priceController.text = widget.venue!['price_per_plate'].toString();
       _contactController.text = widget.venue!['contact'];
+      _placeController.text = widget.venue!['place'];
+
     }
   }
 
@@ -61,6 +63,12 @@ class _VenueDialogState extends State<VenueDialog> {
               decoration: const InputDecoration(labelText: 'Contact'),
               keyboardType: TextInputType.phone,
             ),
+
+            TextField(
+              controller: _placeController,
+              decoration: const InputDecoration(labelText: 'Location'),
+              keyboardType: TextInputType.text,
+            ),
           ],
         ),
       ),
@@ -74,10 +82,10 @@ class _VenueDialogState extends State<VenueDialog> {
             final newVenue = {
               'name': _nameController.text,
               'capacity': int.parse(_capacityController.text),
-              'image': _imageController.text,
-              'pricePerPlate': int.parse(_priceController.text),
+              'image_url': _imageController.text,
+              'price_per_plate': int.parse(_priceController.text),
               'contact': _contactController.text,
-              'place': _contactController.text,
+              'place': _placeController.text,
 
             };
             widget.onSave(newVenue);

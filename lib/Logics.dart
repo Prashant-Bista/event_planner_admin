@@ -7,34 +7,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:flutter/material.dart';
 
 import 'components.dart';
 final stateProvider = ChangeNotifierProvider.autoDispose<BusinessLogic>((ref)=>BusinessLogic());
 class BusinessLogic extends ChangeNotifier{
   FirebaseFirestore _db = FirebaseFirestore.instance;
-  
-  void _addVenue() {
-  }
 
-  Future<void> _updateVenue(String venueId,BuildContext context) async{
-    return showDialog(
-      context: context,
-      builder: (context) {
-        return VenueDialog(
-          venue: _db.collection("Venues").doc(venueId).get() as Map<String,dynamic>,
-          onSave: (updatedVenue) async{
-            await _db.collection("Venues").doc(venueId).update(
-                {"capacity": updatedVenue["capacity"], "contact":updatedVenue["contact"], "image_url":updatedVenue["image"], "name":updatedVenue["name"], "price_per_plate":updatedVenue["price_per_plate"],});
-          },
-        );
-      },
-    );
-  }
-
-  void _deleteVenue(String venueId) {
-    _db.collection("Venues").doc(venueId).delete();
-  }
   Future<void> deteleData()async{
  QuerySnapshot userSnap= await _db.collection("Users").get();
  Set<String> userIds = userSnap.docs.map((snap)=>snap.id).toSet();
@@ -72,7 +50,6 @@ eventSnap= await _db.collection("Users").doc(userIds.elementAt(i)).collection("E
           dataRow.add(eventDetails["expense"]);
           dataList.add(dataRow);
           print(dataRow.toString());
-//no_of_guests	venue_cost	no_of_tasks	no_of_vendors	budget(target)
         }
       }
       String csvData = ListToCsvConverter().convert(dataList);
@@ -95,6 +72,47 @@ eventSnap= await _db.collection("Users").doc(userIds.elementAt(i)).collection("E
       print(e);
     }
 
+
+  }
+
+  Future<void> addVenue(BuildContext context) {
+    return showDialog(context: context, builder: (context){
+      return VenueDialog(venue:null,onSave: (newVenue) async{
+        await _db.collection("Venues").add(newVenue);
+      });
+    });
+
+  }
+
+  Future<void> updateVenue(String venueId,BuildContext context) async{
+    DocumentSnapshot doc= await _db.collection("Venues").doc(venueId).get();
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return VenueDialog(
+          venue: doc.data() as Map<String,dynamic>,
+          onSave: (updatedVenue) async{
+            await _db.collection("Venues").doc(venueId).update(
+                {"capacity": updatedVenue["capacity"], "contact":updatedVenue["contact"], "image_url":updatedVenue["image_url"], "name":updatedVenue["name"], "price_per_plate":updatedVenue["price_per_plate"],"place":updatedVenue["place"]});
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> deleteVenue(String venueId, BuildContext context) {
+    return showDialog(context: context, builder: (context){
+      return AlertDialog(
+        title: Text("Delete Venue"),
+        content: Text("Are you sure?"),
+        actions: [TextButton(onPressed: (){
+          _db.collection("Venues").doc(venueId).delete();
+          Navigator.of(context).pop();
+        }, child: Text("Delete")),
+          TextButton(onPressed: (){
+          }, child: Text("Cancel"))],
+      );
+    });
 
   }
 
